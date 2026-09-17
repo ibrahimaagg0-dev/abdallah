@@ -1,0 +1,642 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عبدالله & وفاء | نبض وحكاية</title>
+    <!-- استدعاء خط عربي أنيق من جوجل -->
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0c1017;
+            --card-bg: rgba(19, 25, 36, 0.85);
+            --accent-gold: #d4af37;
+            --text-main: #f0f4f8;
+            --text-muted: #94a3b8;
+            --medical-blue: #38bdf8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Cairo', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* حاوية القلوب المتحركة في الخلفية */
+        .hearts-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .heart {
+            position: absolute;
+            bottom: -50px;
+            background: rgba(212, 175, 55, 0.25);
+            transform: rotate(-45deg);
+            animation: floatUp 8s infinite linear;
+        }
+
+        .heart::before,
+        .heart::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: inherit;
+            border-radius: 50%;
+        }
+
+        .heart::before {
+            top: -50%;
+            left: 0;
+        }
+
+        .heart::after {
+            top: 0;
+            left: 50%;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) rotate(-45deg) scale(0.6);
+                opacity: 0;
+            }
+            20% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-110vh) rotate(-45deg) scale(1.2);
+                opacity: 0;
+            }
+        }
+
+        /* شاشة كلمة المرور */
+        #lock-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(12, 16, 23, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        .lock-card {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+        }
+
+        .lock-card h2 {
+            font-family: 'Amiri', serif;
+            color: var(--accent-gold);
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .lock-card p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .lock-card input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: var(--text-main);
+            text-align: center;
+            font-size: 18px;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .lock-card input:focus {
+            border-color: var(--accent-gold);
+        }
+
+        .lock-card button {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent-gold);
+            border: none;
+            border-radius: 10px;
+            color: #000;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .lock-card button:hover {
+            opacity: 0.9;
+        }
+
+        .error-msg {
+            color: #f87171;
+            font-size: 13px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        /* المحتوى الرئيسي للموقع */
+        #main-content {
+            display: none;
+            width: 100%;
+            max-width: 800px;
+            padding: 40px 20px;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        /* زر تحكم الموسيقى العائم */
+        .music-control {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: var(--card-bg);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            color: var(--accent-gold);
+            padding: 8px 15px;
+            border-radius: 30px;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 999;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            backdrop-filter: blur(5px);
+            transition: background 0.3s;
+        }
+
+        .music-control:hover {
+            background: rgba(212, 175, 55, 0.15);
+        }
+
+        /* الترويسة */
+        header {
+            text-align: center;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+            padding-bottom: 30px;
+        }
+
+        header h1 {
+            font-family: 'Amiri', serif;
+            font-size: 38px;
+            color: var(--accent-gold);
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 15px;
+            letter-spacing: 1px;
+        }
+
+        .medical-badge {
+            display: inline-block;
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--medical-blue);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-top: 10px;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+        }
+
+        /* الأقسام العامة */
+        .section-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(8px);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--accent-gold);
+        }
+
+        .section-title {
+            font-family: 'Amiri', serif;
+            font-size: 22px;
+            color: var(--accent-gold);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* تخطيط نبضات القلب (ECG Pulse Section) */
+        .ecg-container {
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        .ecg-line {
+            width: 100%;
+            height: 60px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+        }
+
+        .ecg-svg {
+            width: 100%;
+            height: 40px;
+            stroke: var(--medical-blue);
+            stroke-width: 2.5;
+            fill: none;
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: ecgAnimation 4s linear infinite;
+        }
+
+        @keyframes ecgAnimation {
+            0% { stroke-dashoffset: 1000; }
+            100% { stroke-dashoffset: 0; }
+        }
+
+        .ecg-text {
+            margin-top: 15px;
+            font-family: 'Amiri', serif;
+            font-size: 17px;
+            color: var(--text-main);
+            letter-spacing: 1px;
+        }
+
+        /* الروشتة الطبية للمشاعر */
+        .prescription-box {
+            font-family: 'Amiri', serif;
+            line-height: 2;
+            font-size: 18px;
+            color: #e2e8f0;
+            background: rgba(212, 175, 55, 0.03);
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px dashed rgba(212, 175, 55, 0.3);
+        }
+
+        .prescription-box span {
+            color: var(--accent-gold);
+        }
+
+        /* إضافة رقم 2: رسائل "افتحها عند الحاجة" */
+        .letters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+        }
+
+        .letter-card {
+            background: rgba(0,0,0,0.25);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .letter-card:hover {
+            border-color: var(--accent-gold);
+            background: rgba(212, 175, 55, 0.05);
+            transform: translateY(-3px);
+        }
+
+        .letter-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--accent-gold);
+            margin-bottom: 8px;
+        }
+
+        .letter-preview {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* نافذة عرض الرسالة المنبثقة */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border: 1px solid var(--accent-gold);
+            padding: 30px;
+            border-radius: 16px;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .modal-content h3 {
+            font-family: 'Amiri', serif;
+            color: var(--accent-gold);
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+
+        .modal-content p {
+            font-family: 'Amiri', serif;
+            font-size: 17px;
+            line-height: 1.8;
+            color: #e2e8f0;
+            margin-bottom: 20px;
+        }
+
+        .close-btn {
+            background: var(--accent-gold);
+            color: #000;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        /* إضافة رقم 4: حائط قسم العهد الدائم */
+        .oath-box {
+            font-family: 'Amiri', serif;
+            font-size: 18px;
+            line-height: 2.2;
+            color: #e2e8f0;
+            background: rgba(56, 189, 248, 0.03);
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            text-align: center;
+        }
+
+        .oath-box span {
+            color: var(--medical-blue);
+            font-weight: 700;
+        }
+
+        /* الخاتمة */
+        footer {
+            text-align: center;
+            padding: 20px 0;
+            color: var(--text-muted);
+            font-size: 13px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        footer span {
+            color: var(--accent-gold);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- خلفية القلوب المتحركة -->
+    <div class="hearts-background" id="hearts-container"></div>
+
+    <!-- عنصر الصوت (الأغنية الخاصة بك باسم song.mp3 في نفس المجلد) -->
+    <audio id="bg-music" loop>
+        <source src="song.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- شاشة إدخال كلمة المرور -->
+    <div id="lock-screen">
+        <div class="lock-card">
+            <h2>مساحة خاصة</h2>
+            <p>أدخل الرمز السري للمتابعة إلى عالمنا</p>
+            <input type="password" id="pass-input" placeholder="••••••" maxlength="6">
+            <button onclick="checkPassword()">دخول</button>
+            <div id="error-msg" class="error-msg">الرمز غير صحيح، حاول مرة أخرى.</div>
+        </div>
+    </div>
+
+    <!-- نافذة الرسائل المنبثقة (Modal) -->
+    <div id="letter-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="modal-title">عنوان الرسالة</h3>
+            <p id="modal-text">نص الرسالة سيظهر هنا...</p>
+            <button class="close-btn" onclick="closeModal()">إغلاق</button>
+        </div>
+    </div>
+
+    <!-- محتوى الموقع الرئيسي -->
+    <div id="main-content">
+        <!-- زر التحكم بالموسيقى -->
+        <button class="music-control" onclick="toggleMusic()">
+            <span id="music-icon">🎵</span> <span id="music-text">إيقاف الموسيقى</span>
+        </button>
+
+        <div class="container">
+            <header>
+                <h1>عبدالله & وفاء</h1>
+                <p>حكاية صاغها القدر، وجمعت بين نبضات قلبي طببتهما الحياة معاً</p>
+                <div class="medical-badge">Rx: Love & Eternity</div>
+            </header>
+
+            <!-- مؤشر نبضات القلب المتزامن -->
+            <section class="section-card">
+                <div class="section-title">💓 إيقاع النبض المتزامن</div>
+                <div class="ecg-container">
+                    <div class="ecg-line">
+                        <svg class="ecg-svg" viewBox="0 0 500 50">
+                            <path d="M0,25 L80,25 L95,5 L110,45 L125,10 L140,40 L155,25 L240,25 L255,5 L270,45 L285,10 L300,40 L315,25 L400,25 L415,5 L430,45 L445,10 L460,40 L475,25 L500,25" />
+                        </svg>
+                    </div>
+                    <div class="ecg-text">"نبضاتنا تسير في خط متوازي نحو مستقبل واحد لا يفرقها زمن."</div>
+                </div>
+            </section>
+
+            <!-- روشتة المشاعر -->
+            <section class="section-card">
+                <div class="section-title">🩺 التشخيص الإكلينيكي للقلب</div>
+                <div class="prescription-box">
+                    <span>التشخيص:</span> تعلق روحي مزمن لا شفا منه ولا بحث عن بديل، بدأ منذ أعوام طويلة وما زال في تصاعد مستمر.<br><br>
+                    <span>التعليمات والجرعات:</span> يُتناول الحب والدعم المتبادل كل صباح، وتؤخذ جرعات الصبر والأمل بلا توقف حتى آخر العمر.<br><br>
+                    <span>ملاحظات الطبيب:</span> هذه الحالة مستثناة من كافة قوانين الزمن، وكل دقيقة تمر تزيدها عمقاً وثباتاً.
+                </div>
+            </section>
+
+            <!-- 2. رسائل "افتحها عند الحاجة" (Interactive) -->
+            <section class="section-card">
+                <div class="section-title">💌 افتحها عندما...</div>
+                <div class="letters-grid">
+                    <div class="letter-card" onclick="openLetter('عندما تشعر بالإرهاق', 'حين تثقلك ضغوط المستشفيات والكتب، تذكر دائماً أن هناك قلباً ينبض لك وحدك، وأن تعبك يهون حين أكون بجانبك سنداً لا يميل.')">
+                        <div class="letter-title">...تشعر بالإرهاق</div>
+                        <div class="letter-preview">اضغط لقراءة الجرعة البديلة</div>
+                    </div>
+                    <div class="letter-card" onclick="openLetter('عندما يشتد الشوق', 'المسافات والأوقات الطويلة لا تستطيع أبداً أن تبعدنا؛ فروحانا تلتقيان كلما أشرق صباح أو غاب شفق. أنت دائماً في البال والقلب.')">
+                        <div class="letter-title">...يشتد الشوق</div>
+                        <div class="letter-preview">اضغط لقراءة الجرعة البديلة</div>
+                    </div>
+                    <div class="letter-card" onclick="openLetter('عندما تحتاج لتذكير', 'أريدك أن تتذكر جيداً أنك العوض الجميل، والقصة الأثمن التي كتبها القدر في عمري، وأن اسمك مقرن باسمي إلى الأبد.')">
+                        <div class="letter-title">...تريد تذكيرًا</div>
+                        <div class="letter-preview">اضغط لقراءة الجرعة البديلة</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. قسم العهد الدائم (Oath Section) -->
+            <section class="section-card">
+                <div class="section-title">⚖️ قسم العهد الأبدي</div>
+                <div class="oath-box">
+                    "أُقسم بشرف المحبة وصدق الدرب أن أظل <span>السند الدافئ</span> حين تترنح بك الأيام، وأن أشاركك مرارة السهر قبل حلاوة النجاح، وأن يظل اسم <span>عبدالله</span> مقترناً باسم <span>وفاء</span> في كل نبضة حياة وحتى أبد الآبدين."
+                </div>
+            </section>
+
+            <footer>
+                صُنع بحب لأجل <span>عبدالله ووفاء</span> 🤍
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        // توليد قلوب متحركة في الخلفية
+        function createHearts() {
+            const container = document.getElementById('hearts-container');
+            const heartCount = 15;
+
+            for (let i = 0; i < heartCount; i++) {
+                const heart = document.createElement('div');
+                heart.classList.add('heart');
+                
+                const size = Math.random() * 15 + 10;
+                heart.style.width = `${size}px`;
+                heart.style.height = `${size}px`;
+                heart.style.left = `${Math.random() * 100}vw`;
+                
+                const duration = Math.random() * 6 + 4;
+                const delay = Math.random() * 5;
+                heart.style.animationDuration = `${duration}s`;
+                heart.style.animationDelay = `${delay}s`;
+
+                container.appendChild(heart);
+            }
+        }
+        createHearts();
+
+        // نافذة الرسائل المنبثقة
+        function openLetter(title, text) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-text').innerText = text;
+            document.getElementById('letter-modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('letter-modal').style.display = 'none';
+        }
+
+        // التحقق من كلمة المرور وتشغيل الأغنية
+        function checkPassword() {
+            const input = document.getElementById('pass-input').value;
+            const lockScreen = document.getElementById('lock-screen');
+            const mainContent = document.getElementById('main-content');
+            const errorMsg = document.getElementById('error-msg');
+            const bgMusic = document.getElementById('bg-music');
+
+            if (input === '522006') {
+                bgMusic.play().catch(error => {
+                    console.log("Audio autoplay prevented", error);
+                });
+
+                lockScreen.style.opacity = '0';
+                lockScreen.style.visibility = 'hidden';
+                mainContent.style.display = 'block';
+                setTimeout(() => {
+                    mainContent.style.opacity = '1';
+                }, 50);
+            } else {
+                errorMsg.style.display = 'block';
+            }
+        }
+
+        // الضغط على زر Enter للدخول
+        document.getElementById('pass-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                checkPassword();
+            }
+        });
+
+        // تحكم زر الموسيقى (إيقاف / تشغيل)
+        function toggleMusic() {
+            const bgMusic = document.getElementById('bg-music');
+            const musicText = document.getElementById('music-text');
+            const musicIcon = document.getElementById('music-icon');
+
+            if (bgMusic.paused) {
+                bgMusic.play();
+                musicText.innerText = "إيقاف الموسيقى";
+                musicIcon.innerText = "🎵";
+            } else {
+                bgMusic.pause();
+                musicText.innerText = "تشغيل الموسيقى";
+                musicIcon.innerText = "🔇";
+            }
+        }
+    </script>
+</body>
+</html>
